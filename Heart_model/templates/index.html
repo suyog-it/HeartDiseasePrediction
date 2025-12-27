@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>❤️ Heart Disease Prediction</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <div class="container">
+    <h1>❤️ Heart Disease Prediction</h1>
+    <p class="subtitle">Enter patient details to check risk probability</p>
+
+    <form id="predictionForm">
+      <div class="grid">
+
+        <div class="form-group">
+          <label>Age</label>
+          <input type="number" id="age" placeholder="Enter age" required />
+        </div>
+
+        <div class="form-group">
+          <label>Sex</label>
+          <select id="sex" required>
+            <option value="">Select</option>
+            <option value="1">Male</option>
+            <option value="0">Female</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Chest Pain Type (cp)</label>
+          <select id="cp" required>
+            <option value="">Select</option>
+            <option value="1">Typical Angina</option>
+            <option value="2">Atypical Angina</option>
+            <option value="3">Non-anginal Pain</option>
+            <option value="4">Asymptomatic</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Resting Blood Pressure (trestbps)</label>
+          <input type="number" id="trestbps" placeholder="mm Hg" required />
+        </div>
+
+        <div class="form-group">
+          <label>Serum Cholesterol (chol)</label>
+          <input type="number" id="chol" placeholder="mg/dl" required />
+        </div>
+
+        <div class="form-group">
+          <label>Fasting Blood Sugar (fbs)</label>
+          <select id="fbs" required>
+            <option value="">Select</option>
+            <option value="1">Yes</option>
+            <option value="0">No</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Resting ECG (restecg)</label>
+          <select id="restecg" required>
+            <option value="">Select</option>
+            <option value="0">Normal</option>
+            <option value="1">ST-T Abnormality</option>
+            <option value="2">Left Ventricular Hypertrophy</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Max Heart Rate (thalach)</label>
+          <input type="number" id="thalach" placeholder="bpm" required />
+        </div>
+
+        <div class="form-group">
+          <label>Exercise Induced Angina (exang)</label>
+          <select id="exang" required>
+            <option value="">Select</option>
+            <option value="1">Yes</option>
+            <option value="0">No</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Oldpeak</label>
+          <input type="number" step="0.1" id="oldpeak" placeholder="e.g. 2.3" required />
+        </div>
+
+        <div class="form-group">
+          <label>Slope</label>
+          <select id="slope" required>
+            <option value="">Select</option>
+            <option value="1">Upsloping</option>
+            <option value="2">Flat</option>
+            <option value="3">Downsloping</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Number of Major Vessels (ca)</label>
+          <input type="number" min="0" max="3" id="ca" placeholder="0–3" required />
+        </div>
+
+        <div class="form-group">
+          <label>Thal</label>
+          <select id="thal" required>
+            <option value="">Select</option>
+            <option value="3">Normal</option>
+            <option value="6">Fixed Defect</option>
+            <option value="7">Reversible Defect</option>
+          </select>
+        </div>
+
+      </div>
+
+      <button type="submit" class="btn">Predict 💡</button>
+    </form>
+
+    <div id="result"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById('predictionForm');
+    const resultBox = document.getElementById('result');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      resultBox.innerHTML = "<div class='loading'>⏳ Predicting...</div>";
+
+      const data = {
+        age: +age.value,
+        sex: +sex.value,
+        cp: +cp.value,
+        trestbps: +trestbps.value,
+        chol: +chol.value,
+        fbs: +fbs.value,
+        restecg: +restecg.value,
+        thalach: +thalach.value,
+        exang: +exang.value,
+        oldpeak: +oldpeak.value,
+        slope: +slope.value,
+        ca: +ca.value,
+        thal: +thal.value
+      };
+
+      const response = await fetch("/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+
+      const result = await response.json();
+
+      resultBox.innerHTML = `<div class="result-card">
+        <h2>${result.prediction === 1 ? "⚠️ High Risk of Heart Disease" : "✅ Low Risk of Heart Disease"}</h2>
+        <p>Model Confidence: ${(result.confidence * 100).toFixed(1)}%</p>
+      </div>`;
+    });
+  </script>
+
+</body>
+</html>
